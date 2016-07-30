@@ -1,0 +1,26 @@
+CACHE MANIFEST
+#v2 ${versao-inicial}
+
+https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en
+https://fonts.googleapis.com/icon?family=Material+Icons
+https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css
+https://code.getmdl.io/1.1.3/material.yellow-blue.min.css
+/assets/css/main.css
+/assets/js/localstoragedb.min.js
+/assets/js/bundle.js
+/assets/js/app/*
+
+NETWORK:
+*
+
+FALLBACK:
+/localstorage-cache/ index.html
+
+CACHE:
+/assets/images/smile.ico
+/assets/images/smile16.png
+/assets/images/smile24.png
+/assets/images/smile32.png
+/assets/images/smile64.png
+/assets/images/smile128.png
+/assets/images/smile256.png

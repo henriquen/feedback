@@ -4,6 +4,7 @@ module.exports = function(express, app, path) {
 
   app.set('views', path + '/views');
   app.set('view engine', 'jsx');
+
   app.engine('jsx', require('express-react-views').createEngine());
 
 };

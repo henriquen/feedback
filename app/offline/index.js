@@ -1,32 +1,51 @@
-import  {
-    FEEDBACK_INVITES_INVITE_COMPLETED,
-    FEEDBACK_OFFLINE
-} from '../api';
+import  { FEEDBACK_OFFLINE } from 'api';
 
-export default function middlewareInvite({ getState }) {
+//consultar chrome://appcache-internals/
+export default class OfflineWorker {
 
-    return (dispatch) => (action) => {
+  type = 'online';
 
-        console.log('action original', action);
+  constructor(store) {
+    this.store = store;
 
-        let returnValue = dispatch(action);
+    const appCache = window.applicationCache;
 
-        //let offline = !navigator.onLine;
-        //if( offline &&
-        //    action.type === FEEDBACK_INVITES_INVITE_COMPLETED) {
-        //    returnValue = dispatch({
-        //        type: FEEDBACK_OFFLINE
-        //    });
-        //} else {
-        //    returnValue = dispatch(action);
-        //}
+    window.addEventListener('load', function () {
+      window.addEventListener('online', this.updateStatus.bind(this));
+      window.addEventListener('offline', this.updateStatus.bind(this));
 
-        let state = getState();
+      if( appCache.status > appCache.UNCACHED ) {
+        appCache.addEventListener('updateready', this.updateVersion.bind(this));
+        appCache.update();
+      }
 
-        console.log('action after dispatch', action, state);
+    }.bind(this));
+  }
 
-        return returnValue;
+  updateVersion = () => {
+    const {applicationCache, location} = window;
+    applicationCache.swapCache();
+    location.reload();
+  }
 
+  register = () => {
+    console.log("Qual evento?", this.type, arguments);
+    let state = this.store.getState();
+
+    console.log("state", state);
+
+    if( state.offline ) {
+      debugger;
     }
+
+  }
+
+  updateStatus = (event) => {
+    this.type = event.type;
+    this.store.dispatch({
+      type: FEEDBACK_OFFLINE,
+      payload: this.type === 'offline'
+    });
+  }
 
 }

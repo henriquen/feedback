@@ -13,5 +13,8 @@ export default {
     accent1Color: blue500,
     accent2Color: blue700,
     accent3Color: blue600
+  },
+  flatButton: {
+    color: blue500,
   }
 };

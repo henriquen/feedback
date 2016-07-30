@@ -1,16 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Feedback from './feedback';
+import Feedback from 'feedbacks/feedback';
+import { FEEDBACKS } from 'api';
 
 @connect( (state) => ({
-  rest: state.rest,
   feedbacks: state.feedbacks
 }) )
 export default class Feedbacks extends React.Component {
 
   componentDidMount() {
-    const {dispatch, rest} = this.props;
-    dispatch(rest.actions.feedbacks.sync());
+    const {dispatch} = this.props;
+    dispatch({
+      type: FEEDBACKS.REQUEST
+    });
   }
 
   mapFeedbacks = feedback => {
@@ -19,12 +21,12 @@ export default class Feedbacks extends React.Component {
 
   render() {
 
-    const list = this.props.feedbacks.data.map(this.mapFeedbacks);
+    const list = this.props.feedbacks.map(this.mapFeedbacks);
 
     return(
-        <div className="feedbacks">
-            {list}
-        </div>
+      <div className="feedbacks">
+          {list}
+      </div>
     )
   }
 

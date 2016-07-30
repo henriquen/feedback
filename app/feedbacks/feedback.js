@@ -23,8 +23,9 @@ class Feedback extends Component {
       }
 
       return <Badge
+        key={`badge-${invited.id}`}
         badgeContent={invited.feedbacks}
-        secondary={invited.feedbacks}
+        secondary={!!invited.feedbacks}
         badgeStyle={badgeStyle}
       >
         <Chip key={`chip-invited-${invited.id}`}

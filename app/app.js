@@ -1,56 +1,30 @@
-import  { FEEDBACK_OFFLINE } from './api';
-
-class OnlineOffline {
-
-  type = 'online';
-
-  constructor(store) {
-    this.store = store;
-    window.addEventListener('load', function() {
-      window.addEventListener('online',  this.updateStatus.bind(this));
-      window.addEventListener('offline', this.updateStatus.bind(this));
-    }.bind(this));
-  }
-
-  register = () => {
-    console.log("Qual evento?", this.type);
-  }
-
-  updateStatus = (event) => {
-    this.type = event.type;
-    this.store.dispatch({
-      type: FEEDBACK_OFFLINE,
-      payload: this.type === 'offline'
-    });
-  }
-
-}
+import "babel-polyfill";
 
 import ReactDOM from 'react-dom';
 import React from 'react';
-import { Router, Route, IndexRedirect, browserHistory } from 'react-router';
+import { Router, Route, browserHistory } from 'react-router';
 
-import { createStore, compose, combineReducers, applyMiddleware } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
-import thunkMiddleware from 'redux-thunk';
-import rest from './restful';
 
-import api from './api';
+import createSagaMiddleware from 'redux-saga';
+
+import api, {sagas} from 'api';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import FeedbacksTheme from './theme';
+import FeedbacksTheme from 'theme';
 import Menu from './global/menu.js';
 import Profile from './profile';
 
-import Invites from './invites/invites.js';
-import Invite from './invites/invite.js';
-import Feedbacks from './feedbacks/feedbacks.js';
+import Invites from 'invites/invites.js';
+import Invite from 'invites/invite.js';
+import Feedbacks from 'feedbacks/feedbacks.js';
 
-import database from './database';
-import middlewareInvite from './offline';
+import database from 'database';
+import OfflineWorker from 'offline';
 
 injectTapEventPlugin();
 
@@ -81,20 +55,22 @@ class App extends React.Component {
 class Root extends React.Component {
   render() {
 
+    const sagaMiddleware = createSagaMiddleware();
+
     const reducer = combineReducers({
-      ...api,
       routing: routerReducer,
-      rest: () => rest,
-      ...rest.reducers
+      ...api
     });
 
-    const store = compose(
-        applyMiddleware(thunkMiddleware, middlewareInvite)
-    )(createStore)(reducer);
+    const store = createStore(
+      reducer,
+      applyMiddleware(sagaMiddleware)
+    );
 
-    const online = new OnlineOffline(store);
+    sagaMiddleware.run(sagas);
 
-    store.subscribe(online.register.bind(online));
+    // const offline = new OfflineWorker(store);
+    // store.subscribe(offline.register.bind(offline));
 
     const history = syncHistoryWithStore(browserHistory, store);
 
